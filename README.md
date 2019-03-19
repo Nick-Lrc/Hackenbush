@@ -1,5 +1,4 @@
 # Hackenbush
----
 ### Intro
 - A Hackenbush involves two players to remove line segments on a graph. One player can remove blue lines while the other can remove red lines. The player who removes the last line wins.
 
