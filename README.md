@@ -20,6 +20,7 @@
 - The winner is shown beside the game status.
 - The first player can start by clicking on either a red or a blue line.
 - The two players must make cut alternatively. If a red/blue line is cutted, the red/blue lines will be automatically disabled in the next turn. The blue/red lines are activated in the next turn.
+- To randomly generate a new graph, refresh the page.
 
 ### Note
 - This demo is not great for a real game play. A player can just cut the line near the black ground line.
