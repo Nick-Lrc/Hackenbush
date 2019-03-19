@@ -5,11 +5,11 @@
 ### Game Status
 - Let each blue line have a positive unit score and each red line have a negative unit score.
 - The summation of the scores defines a game's status.
-- A game $G$ have four states.
-    - $G>0$: player picking the blue line can win
-    - $G<0$: player picking the red line can win
-    - $G=0$: $2$nd player can win
-    - $G\ngtr 0,G\nless0$: $1$st player can win
+- A game G have four states.
+    - G>0: player picking the blue line can win
+    - G<0: player picking the red line can win
+    - G=0: 2nd player can win
+    - G!>0,G!<0: 1st player can win
 - The first three cases are covered in the demo. The fourth one is excluded because this case requires lines with another color.
 
 ### A Demo
