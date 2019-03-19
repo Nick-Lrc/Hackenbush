@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Simple Hackenbush Game Demo</title>
+</head>
+
+<body>
+<div><strong>Simple Hackenbush Game Demo</strong></div>
+<div>
+Current Game (#Blue - #Red): <span id="counter"></span>
+<span id="winner"></span>
+</div>
+<script>
+	var padding = 20
+	var canvasWidth = 500
+	var canvasHeight = 500
+	var innerWidth = 4
+	var outlineWidth = 6
+	var strokeWidth = 8
+	var minLineDim = 100
+	var maxLineDim = 200
+	var numLines = 10
+	var numRed = 0
+	var numBlue = 0
+	
+	var red = '#FF4500'
+	var blue = '#1E90FF'
+	var black = '#000000'
+	var white = '#FFFFFF'
+	var colors = []
+	
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+	var svgNS = svg.namespaceURI
+	svg.setAttribute('width', canvasWidth + padding * 2)
+	svg.setAttribute('height', canvasHeight + padding * 2)
+	createLine(padding, canvasWidth, canvasHeight, canvasHeight, 'base', black, false)
+	createGraph()
+	
+	// Remove the clicked line and all lines afterward
+	function removeLine(e) {
+		var line = e.target
+		classId = line.getAttribute('class')
+		currColor = line.getAttribute('trueColor')
+		
+		for (i = classId; i < colors.length; i++) {
+			lines = svg.querySelectorAll("[class='" + i + "']")
+			if (colors[i] == red) {
+				numRed -= 1
+			} else {
+				numBlue -= 1
+			}
+			for (j = 0; j < lines.length; j++) {
+				svg.removeChild(lines[j])
+			}
+		}
+		
+		// Deactivate lines with the same color of the clicked line;
+		// Activate lines with the different color
+		colors = colors.slice(0, classId)
+		for (i = 0; i < colors.length; i++) {
+			lines = svg.querySelectorAll("[class='" + i + "']")
+			if (colors[i] == currColor) {
+				for (j = 0; j < lines.length; j++) {
+					lines[j].onclick = function() { return false }
+				}
+			} else {
+				for (j = 0; j < lines.length; j++) {
+					lines[j].onclick = removeLine
+				}
+			}
+		}
+		
+		updateGame()
+		getWinner(currColor)
+	}
+	
+	// Create a line
+	function createLine(x1, x2, y1, y2, classId, color, remove = true) {
+		createLineHelper(x1, x2, y1, y2, classId, white, color, strokeWidth, remove)
+		createLineHelper(x1, x2, y1, y2, classId, black, color, outlineWidth, remove)
+		createLineHelper(x1, x2, y1, y2, classId, color, color, innerWidth, remove)
+		document.body.appendChild(svg)
+	}
+	
+	function createLineHelper(x1, x2, y1, y2, classId, color, trueColor, width, remove = true) {
+		var line = document.createElementNS(svgNS, 'line')
+		line.setAttribute('class', classId)
+		line.setAttribute('trueColor', trueColor)
+		if (remove) {
+			line.onclick = removeLine
+		}
+		line.setAttribute('x1', x1)
+		line.setAttribute('x2', x2)
+		line.setAttribute('y1', y1)
+		line.setAttribute('y2', y2)
+		line.setAttribute('stroke', color)
+		line.setAttribute('stroke-width', width)
+		line.setAttribute('stroke-linecap', 'round')
+		svg.appendChild(line)
+	}
+	
+	// Randomly create a graph
+	function createGraph() {
+		x1 = Math.floor(canvasWidth / 2)
+		y1 = canvasHeight
+		lastParent = 0
+		
+		for (i = 0; i < numLines; i++) {
+			var pt = getNextPt(x1, y1)
+			x2 = pt[0]
+			y2 = pt[1]
+			color = ""
+			if (Math.random() < 0.5) {
+				color = red
+				numRed += 1
+			} else {
+				color = blue
+				numBlue += 1
+			}
+			createLine(x1, x2, y1, y2, i, color)
+			colors.push(color)
+			
+			x1 = x2
+			y1 = y2
+			lastParent = i
+		}
+		updateGame()
+	}
+	
+	function getNextPt(x1, y1) {
+		xShift = Math.floor(Math.random() * maxLineDim)
+		yShift = maxLineDim - xShift
+		x2 = shift(x1, xShift, canvasWidth)
+		y2 = shift(y1, yShift, canvasHeight)
+		return [x2, y2]
+	}
+	
+	function shift(original, amount, constraint) {
+		output = original
+		if (original + amount >= constraint || (Math.random() < 0.5 && original - amount >= 0)) {
+			output -= amount
+		} else {
+			output += amount
+		}
+		return output
+	}
+	
+	// Update the game status
+	function updateGame() {
+		var counter = document.getElementById("counter")
+		counter.innerHTML = numBlue - numRed
+	}
+	
+	// Get the winner
+	function getWinner(lastColorRemoved) {
+		if (colors.indexOf(red) == -1 || colors.indexOf(blue) == -1) {
+			var winner = document.getElementById("winner")
+			// If no line left, player who clicked the last edge wins
+			if (colors.indexOf(red) == -1 && colors.indexOf(blue) == -1) {
+				if (lastColorRemoved == blue) {
+					winner.innerHTML = "Blue wins!"
+				} else {
+					winner.innerHTML = "Red wins!"
+				}
+			} else if (colors.indexOf(red) == -1) {
+				winner.innerHTML = "Blue wins!"
+			} else {
+				winner.innerHTML = "Red wins!"
+			}
+			
+			for (i = 0; i < colors.length; i++) {
+				lines = svg.querySelectorAll("[class='" + i + "']")
+				for (j = 0; j < lines.length; j++) {
+					lines[j].onclick = function() { return false }
+				}
+			}
+		}
+	}
+</script>
+</body>
+</html>
